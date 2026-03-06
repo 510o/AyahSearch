@@ -19,7 +19,7 @@ def search(query: str, quran_index, clean_index, simple_index):
                             results.append((key, quran_index[key]))
                             break
 
-                    elif combining(l[0]) and not combining(query_rooms[i]):
+                    elif combining(l[0]) and not combining(query_rooms[i][0]):
                         continue
 
                     else:

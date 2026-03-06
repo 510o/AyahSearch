@@ -19,7 +19,7 @@ uthmani_engine = AyahSearch(
     BASE_DIR / "uthmani-min.xml"
 )
 
-results = uthmani_engine.search("أولئكم")
+results = uthmani_engine.search("استَوقَدَ")
 
 for (sura, aya), text in results:
     print(sura, aya, text)
