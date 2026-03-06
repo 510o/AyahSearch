@@ -16,10 +16,10 @@ plain_engine = AyahSearch(
 uthmani_engine = AyahSearch(
     BASE_DIR / "Quran.xml",
     BASE_DIR / "uthmani-clean.xml",
-    BASE_DIR / "uthmani-min.xml"
+    BASE_DIR / "uthmani-simple.xml"
 )
 
-results = uthmani_engine.search("استَوقَدَ")
+results = uthmani_engine.search("")
 
 for (sura, aya), text in results:
     print(sura, aya, text)
