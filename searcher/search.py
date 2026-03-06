@@ -1,6 +1,9 @@
 from .diacritics import diac_rooms, combining
 
 def search(query: str, quran_index, clean_index, simple_index):
+    if not query:
+        return []
+    
     query_plain = "".join(c for c in query if not combining(c))
     with_diac = any(combining(c) for c in query)
     results = []
