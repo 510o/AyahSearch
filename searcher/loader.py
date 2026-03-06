@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import parse
 
 def load_quran(path):
-    return ET.parse(path).getroot()
+    return parse(path).getroot()
