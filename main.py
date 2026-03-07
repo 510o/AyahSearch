@@ -1,16 +1,19 @@
 from searcher.engine import AyahSearch
 from config import BASE_DIR
 
+
 plain_engine = AyahSearch(
     BASE_DIR / "Quran.xml",
     BASE_DIR / "clean.xml",
     BASE_DIR / "simple.xml"
 )
 
-#results = plain_engine.search("كسْفا")
+word = plain_engine.search("كسْفا")
+num = plain_engine.search("228")
+sura = plain_engine.search("إسراء")
 
-#for (sura, aya), text in results:
-#    print(sura, aya, text)
+for result in sura:
+    print(*result) 
 
 
 uthmani_engine = AyahSearch(
@@ -19,7 +22,7 @@ uthmani_engine = AyahSearch(
     BASE_DIR / "uthmani-simple.xml"
 )
 
-results = uthmani_engine.search("")
+results = uthmani_engine.search("ناكسوا")
 
-for (sura, aya), text in results:
-    print(sura, aya, text)
+#for (sura, aya), text in results:
+#    print(sura, aya, text)
