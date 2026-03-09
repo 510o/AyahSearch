@@ -9,10 +9,10 @@ plain_engine = AyahSearch(
 )
 
 word = plain_engine.search("كسْفا")
-num = plain_engine.search("228")
+num = plain_engine.search("")
 sura = plain_engine.search("إسراء")
 
-for result in sura:
+for result in num:
     print(*result) 
 
 

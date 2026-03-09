@@ -1,11 +1,22 @@
 from .diacritics import diac_rooms, combining
+from re import findall
 
 
-def number_search(number, keys, quran_text):
+def number_search(nums, keys, quran_text):
+    sura = nums[0]
+    
+    if len(nums) > 1:
+        aya = nums[1]
+        return [
+            (key, text)
+            for key, text in zip(keys, quran_text)
+            if key[0] == sura and key[1] == aya
+        ]
+
     return [
         (key, text)
         for key, text in zip(keys, quran_text)
-        if number == key[1] or number == key[0] and key[1] == 1
+        if key[0] == sura and key[1] == 1
     ]
 
 
@@ -14,11 +25,11 @@ def sura_search(query, key, suras):
 
 
 def search(query: str, keys, suras, quran_text, clean_text, simple_text):
-    if not query:
+    if not query.strip():
         return []
     
-    if query.isnumeric(): 
-        return number_search(int(query), keys, quran_text)
+    if nums := list(map(int, findall(r"\d+", query))): 
+        return number_search(nums, keys, quran_text)
 
     query_rooms = diac_rooms(query)
     query_plain = "".join(c for c in query if not combining(c))
