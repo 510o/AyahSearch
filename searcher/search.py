@@ -55,7 +55,7 @@ def verse_search(query, quran_index, clean_index, simple_index, suras):
 
         if query_plain in f" {text} ":
             if with_diac:
-                simple_rooms = diac_rooms(simple_index[key])
+                simple_rooms = diac_rooms(f" {simple_index[key]} ")
                 j = 0
                 for l in simple_rooms:
                     if query_rooms[j] in l:
