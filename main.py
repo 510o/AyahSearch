@@ -1,5 +1,5 @@
-from .searcher.engine import AyahSearch
-from .config import BASE_DIR
+from searcher.engine import AyahSearch
+from config import BASE_DIR
 
 
 plain_engine = AyahSearch(
