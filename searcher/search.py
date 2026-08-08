@@ -1,44 +1,51 @@
 from .diacritics import diac_rooms, combining
 import re
 
-def split_by_letters(query, letters):
-    if not query.strip():
-        return []
+def split_by_letters(query, letters, space = " "):
+    parts, current = [], []
+    neutral, check = 0, None
 
-    parts, current, spaces = [], [], []
-    check = None
-
-    for ch in query:
-        if ch.isspace():
-            spaces.append(ch)
+    for chr in query:
+        if chr == space:
+            neutral += 1
             continue
 
-        in_letters = ch in letters
+        in_letters = chr in letters
 
         if check is None:
-            current = spaces + [ch]
-            check = in_letters
-            spaces = []
-            continue
+            if in_letters and neutral:
+                current.append(space)
 
-        if in_letters == check:
-            current += spaces + [ch]
-            spaces = []
-        else:
+            current.append(chr)
+
+        elif in_letters == check:
+            if neutral:
+                current.append(space)
+
+            current.append(chr)
+
+        elif neutral > 1:
             if check:
-                if spaces:
-                    current.append(' ')
-                parts.append(''.join(current))
-                current = [ch]
-            else:
-                parts.append(''.join(current))
-                current = ([spaces[0]] if spaces else []) + [ch]
-            check = in_letters
-            spaces = []
+                current.append(space)
+                parts.append("".join(current))
+                current = [chr]
 
-    current += spaces
+            else:
+                parts.append("".join(current))
+                current = [space, chr]
+
+        else:
+            parts.append("".join(current))
+            current = [chr]
+
+        check = in_letters
+        neutral = 0
+
+    if neutral and check:
+        current.append(space)
+
     if current:
-        parts.append(''.join(current))
+        parts.append("".join(current))
 
     return parts
 
@@ -103,7 +110,7 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
     nums = []
 
     for chunk in chunks[:2]:
-        if chunk[0] in letters:
+        if chunk.strip()[0] in letters:
             text_chunk = chunk
         else:
             nums = [int(m.group()) for m in re.finditer(r"\d+", chunk)]
