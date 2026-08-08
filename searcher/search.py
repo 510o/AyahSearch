@@ -1,53 +1,6 @@
 from .diacritics import diac_rooms, combining
-import re
-
-def split_by_letters(query, letters, space = " "):
-    parts, current = [], []
-    neutral, check = 0, None
-
-    for chr in query:
-        if chr == space:
-            neutral += 1
-            continue
-
-        in_letters = chr in letters
-
-        if check is None:
-            if in_letters and neutral:
-                current.append(space)
-
-            current.append(chr)
-
-        elif in_letters == check:
-            if neutral:
-                current.append(space)
-
-            current.append(chr)
-
-        elif neutral > 1:
-            if check:
-                current.append(space)
-                parts.append("".join(current))
-                current = [chr]
-
-            else:
-                parts.append("".join(current))
-                current = [space, chr]
-
-        else:
-            parts.append("".join(current))
-            current = [chr]
-
-        check = in_letters
-        neutral = 0
-
-    if neutral and check:
-        current.append(space)
-
-    if current:
-        parts.append("".join(current))
-
-    return parts
+from .segmenter import split_by_letters
+from re import finditer
 
 
 def verse_search(query, quran_index, clean_index, simple_index, suras):
@@ -107,25 +60,22 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
         return {}
 
     text_chunk = ""
-    nums = []
+    nums = [int(m.group()) for m in finditer(r"\d+", query)]
 
-    for chunk in chunks[:2]:
-        if chunk.strip()[0] in letters:
+    for chunk in chunks:
+        if not text_chunk and chunk[0] in letters:
             text_chunk = chunk
-        else:
-            nums = [int(m.group()) for m in re.finditer(r"\d+", chunk)]
 
     if text_chunk:
-        if nums:
-            text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras)
+        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras)
 
+        if nums:
             filtered = {}
             for key_type, mapping in text_results.items():
-                filtered[key_type] = {k: v for k, v in mapping.items() if k[1] in nums}
+                filtered[key_type] = {k: v for k, v in mapping.items() if k[0] in nums}
             return filtered
 
-        else:
-            return verse_search(text_chunk, quran_index, clean_index, simple_index, suras)
+        return text_results
 
     elif nums:
         return number_search(nums, quran_index)
