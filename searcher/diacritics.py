@@ -1,12 +1,11 @@
 from unicodedata import combining
 
 def diac_rooms(text):
-    result = []
-    for sym in text:
-        if not result:
-            result.append(sym)
-            continue
-
+    if not text.strip():
+        return []
+    
+    result = [text[0]]
+    for sym in text[1:]:
         if combining(sym) and combining(result[-1][0]):
             result[-1] += sym
         else:

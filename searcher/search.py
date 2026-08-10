@@ -38,8 +38,6 @@ def number_search(nums, quran_index):
         return {}
 
     sura = nums[0]
-
-    print(nums)  
     if len(nums) > 1:
         aya = nums[1]
         key = (sura, aya)
@@ -54,17 +52,17 @@ def number_search(nums, quran_index):
 
 
 def search(query, quran_index, clean_index, simple_index, suras, letters):
-    chunks = split_by_letters(query, letters)
-
-    if not chunks:
+    if not query.strip():
         return {}
 
-    text_chunk = ""
     nums = [int(m.group()) for m in finditer(r"\d+", query)]
+    chunks = split_by_letters(query, letters)
+    text_chunk = ""
 
     for chunk in chunks:
-        if not text_chunk and chunk[0] in letters:
+        if chunk[0] in letters:
             text_chunk = chunk
+            break
 
     if text_chunk:
         text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras)

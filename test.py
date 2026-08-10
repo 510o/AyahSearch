@@ -1,4 +1,5 @@
 from searcher.segmenter import split_by_letters
+from shutil import get_terminal_size
 from main import plain_engine
 
 RESHAPE = True  # set to False if you don't want to reshape the text for display
@@ -30,4 +31,4 @@ while True:
     for (sura, aya), text in verses.items():
         print(f"[{sura}:{aya}] {reshape(text)[::-1] if RESHAPE else text}")
 
-    print("-" * 40)
+    print("-" * get_terminal_size().columns)
