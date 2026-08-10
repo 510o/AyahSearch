@@ -24,11 +24,11 @@ while True:
     if RESHAPE:
         for i, chunk in enumerate(chunks):
             if chunk[0] in plain_engine.letters:
-                chunks[i] = reshape(chunk)[::-1]
+                chunks[i] = reshape(chunk, get_display = True)
 
     print(f"\n{repr(chunks)} {n} results:")
 
     for (sura, aya), text in verses.items():
-        print(f"[{sura}:{aya}] {reshape(text)[::-1] if RESHAPE else text}")
+        print(f"[{sura}:{aya}] {reshape(text, get_display = True) if RESHAPE else text}")
 
     print("-" * get_terminal_size().columns)
