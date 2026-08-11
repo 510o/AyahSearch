@@ -30,6 +30,7 @@ while True:
     print(f"\n{repr(chunks)} {n} results:")
 
     for (sura, aya), text in verses.items():
-        print(f"[{sura}:{aya}] {reshape(text, True, width) if RESHAPE else text}")
+        head = f"[{sura}: {aya}] "
+        print(f"{head}{reshape("░"*len(head) + text, True, width).replace("░", "") if RESHAPE else text}")
 
     print("-" * width)
