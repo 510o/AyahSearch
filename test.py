@@ -5,9 +5,9 @@ from main import plain_engine
 RESHAPE = True  # set to False if you don't want to reshape the text for display
 
 if RESHAPE:
-    from arabicreshaper import reshape # pip install git+https://github.com/510o/ArabicReshaper.git
+    from arabicreshaper import reshape, line_breaker # pip install git+https://github.com/510o/ArabicReshaper.git
 
-print("Ayah Search - search by letter, diacritice, or numbers")
+print(line_breaker("Ayah Search - search by letters, diacritices, or numbers", get_terminal_size().columns))
 
 while True:
     query = input("search for: ")
@@ -31,6 +31,7 @@ while True:
 
     for (sura, aya), text in verses.items():
         head = f"[{sura}: {aya}] "
-        print(f"{head}{reshape("░"*len(head) + text, True, width).replace("░", "") if RESHAPE else text}")
+        head_len = len(head)
+        print(f"{head}{reshape(line_breaker("░"*head_len + text, width).replace("░", "", head_len), True) if RESHAPE else text}")
 
     print("-" * width)
