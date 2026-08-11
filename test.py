@@ -11,6 +11,7 @@ print("Ayah Search - search by letter, diacritice, or numbers")
 
 while True:
     query = input("search for: ")
+    width = get_terminal_size().columns
 
     chunks = split_by_letters(query, plain_engine.letters)
     if len(chunks) == 1 and chunks[0] in ("exit", "stop", "quit", "break"):
@@ -24,11 +25,11 @@ while True:
     if RESHAPE:
         for i, chunk in enumerate(chunks):
             if chunk[0] in plain_engine.letters:
-                chunks[i] = reshape(chunk, get_display = True)
+                chunks[i] = reshape(chunk, True)
 
     print(f"\n{repr(chunks)} {n} results:")
 
     for (sura, aya), text in verses.items():
-        print(f"[{sura}:{aya}] {reshape(text, get_display = True) if RESHAPE else text}")
+        print(f"[{sura}:{aya}] {reshape(text, True, width) if RESHAPE else text}")
 
-    print("-" * get_terminal_size().columns)
+    print("-" * width)
