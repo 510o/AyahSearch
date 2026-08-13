@@ -30,8 +30,15 @@ while True:
     print(f"\n{repr(chunks)} {n} results:")
 
     for (sura, aya), text in verses.items():
-        head = f"[{sura}: {aya}] "
-        head_len = len(head)
-        print(f"{head}{reshape(line_breaker("░"*head_len + text, width).replace("░", "", head_len), True) if RESHAPE else text}")
+        lhead = f"[{sura}: {aya}] "
+        head_len = len(lhead)
+        rhead = iter(f" [{aya} :{sura}]")
+
+        if RESHAPE:
+            line = reshape(line_breaker("░" * head_len + text, width, True), True)
+            line = ''.join(next(rhead) if c == '░' else c for c in line)
+            print(line)
+        else:
+            print(lhead + text)
 
     print("-" * width)
