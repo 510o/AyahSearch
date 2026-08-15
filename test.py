@@ -27,7 +27,7 @@ while True:
             if chunk[0] in plain_engine.letters:
                 chunks[i] = reshape(chunk)
 
-        head = f"{chunks} نتائج البحث {n}:"
+        head = f"\n{chunks} نتائج البحث {n}:"
         print(align_text(apply_display(line_breaker(reshape(head), width)), width))
         
     else:
