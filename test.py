@@ -43,7 +43,7 @@ while True:
 
         head = f"{chunks} نتائج البحث {n}:"
         
-        print(build_header("نتائج البحث", f" {chunks}", f":{n} ", width, True))
+        print(build_header("نتائج البحث", f" {chunks}", f"\n:{n} ", width, True))
         
     else:
         print(head)
