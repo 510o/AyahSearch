@@ -16,8 +16,8 @@ if RESHAPE:
             body = line_breaker(body, width, first_line_offset=offset)
         lines = apply_display(body).split('\n')
 
-        lines[-1] = lines[-1] + prefix
-        lines[0] = suffix + lines[0]
+        lines[0] = lines[0] + prefix
+        lines[-1] = suffix + lines[-1]
 
         return align_text('\n'.join(lines), width, right_alignment) if width else '\n'.join(lines)
 
