@@ -36,6 +36,7 @@ while True:
     verses = results.get("verses", {})
     n = len(verses)
 
+    print('\n')
     if RESHAPE:
         for i, chunk in enumerate(chunks):
             if chunk[0] in plain_engine.letters:
@@ -43,7 +44,7 @@ while True:
 
         head = f"{chunks} نتائج البحث {n}:"
         
-        print(build_header("نتائج البحث", f" {chunks}", f"\n:{n} ", width, True))
+        print(build_header("نتائج البحث", f" {chunks}", f":{n} ", width, True))
         
     else:
         print(head)
