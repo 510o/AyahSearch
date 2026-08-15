@@ -10,15 +10,14 @@ if RESHAPE:
     def build_header(body, prefix="", suffix="", width=0, right_alignment=False):
         vlen = lambda line: sum(not combining(c) for c in line)
 
+        body = reshape(body)
         if width:
             offset = min(vlen(prefix), width)
-            lines = line_breaker(reshape(body), width, first_line_offset=offset).split('\n')
-        else:
-            lines = reshape(body).split('\n')
+            body = line_breaker(body, width, first_line_offset=offset)
+        lines = apply_display(body).split('\n')
 
-        lines[0] = prefix + lines[0]
-        lines[-1] = lines[-1] + suffix
-        lines = [apply_display(l) for l in lines]
+        lines[-1] = lines[-1] + prefix
+        lines[0] = suffix + lines[0]
 
         return align_text('\n'.join(lines), width, right_alignment) if width else '\n'.join(lines)
 
@@ -40,11 +39,11 @@ while True:
     if RESHAPE:
         for i, chunk in enumerate(chunks):
             if chunk[0] in plain_engine.letters:
-                chunks[i] = reshape(chunk)
+                chunks[i] = apply_display(reshape(chunk))
 
         head = f"{chunks} نتائج البحث {n}:"
         
-        print(build_header("ناتج البحث", f"{chunks} ", f" {n}:", width, True))
+        print(build_header("نتائج البحث", f" {chunks}", f":{n} ", width, True))
         
     else:
         print(head)
