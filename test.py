@@ -6,6 +6,21 @@ RESHAPE = True  # set to False if you don't want to reshape the text for display
 
 if RESHAPE:
     from arabicdisplayer import reshape, line_breaker, apply_display, align_text # pip install git+https://github.com/510o/ArabicDisplayer.git
+    from unicodedata import combining
+    def build_header(body, prefix="", suffix="", width=0, right_alignment=False):
+        vlen = lambda line: sum(not combining(c) for c in line)
+
+        if width:
+            offset = min(vlen(prefix), width)
+            lines = line_breaker(reshape(body), width, first_line_offset=offset).split('\n')
+        else:
+            lines = reshape(body).split('\n')
+
+        lines[0] = prefix + lines[0]
+        lines[-1] = lines[-1] + suffix
+        lines = [apply_display(l) for l in lines]
+
+        return align_text('\n'.join(lines), width, right_alignment) if width else '\n'.join(lines)
 
 print(line_breaker("Ayah Search - search by letters, diacritices, or numbers", get_terminal_size().columns))
 
@@ -28,17 +43,18 @@ while True:
                 chunks[i] = reshape(chunk)
 
         head = f"{chunks} نتائج البحث {n}:"
-        print(align_text(apply_display(line_breaker(reshape(head), width)), width))
+        
+        print(build_header("ناتج البحث", f"{chunks} ", f" {n}:", width, True))
         
     else:
         print(head)
 
     for (sura, aya), text in verses.items():
-        verse = f"[{sura}: {aya}] {text}"
         if RESHAPE:
-            print(align_text(apply_display(line_breaker(reshape(verse), width)), width))
+            head = f" [{aya} :{sura}]"
+            print(build_header(text, head, "", width, True))
 
         else:
-            print(verse)
+            print(f"[{sura}: {aya}] {text}")
 
     print("-" * width)
