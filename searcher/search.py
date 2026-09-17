@@ -1,34 +1,35 @@
 from .diacritics import diac_rooms, combining
 from .segmenter import split_by_letters
-from re import finditer
+from re import finditer, sub
 
 
-def verse_search(query, quran_index, clean_index, simple_index, suras):
+def verse_search(query, quran_index, clean_index, simple_index, suras, sura):
     query_rooms = diac_rooms(query)
     query_plain = "".join(c for c in query if not combining(c))
     with_diac = any(combining(c) for c in query)
     results = {}
 
-    for key, text in clean_index.items():
-        if key[1] == 1 and query in suras[key[0]]:
-            results.setdefault("suras", {})[key] = quran_index[key]
-
-        if query_plain in f" {text} ":
-            if with_diac:
-                simple_rooms = diac_rooms(f" {simple_index[key]} ")
-                j = 0
-                for l in simple_rooms:
-                    if query_rooms[j] in l:
-                        j += 1
-                        if j == len(query_rooms):
-                            results.setdefault("verses", {})[key] = quran_index[key]
-                            break
-                    elif combining(l[0]) and not combining(query_rooms[j][0]):
-                        continue
-                    else:
-                        j = 0
+    def matches(key):
+        if not with_diac:
+            return True
+        simple_rooms = diac_rooms(f" {simple_index[key]} ")
+        j = 0
+        for l in simple_rooms:
+            if query_rooms[j] in l:
+                j += 1
+                if j == len(query_rooms):
+                    return True
+            elif combining(l[0]) and not combining(query_rooms[j][0]):
+                continue
             else:
-                results.setdefault("verses", {})[key] = quran_index[key]
+                j = 0
+        return False
+
+    for key, text in clean_index.items():
+        if sura and suras[key[0]] != sura:
+            continue
+        if query_plain in f" {text} " and matches(key):
+            results[key] = quran_index[key]
 
     return results
 
@@ -37,16 +38,12 @@ def number_search(nums, quran_index):
     if not nums:
         return {}
 
-    sura = nums[0]
-    if len(nums) > 1:
-        aya = nums[1]
-        key = (sura, aya)
-        if key in quran_index:
-            return {"verses": {key: quran_index[key]}}
+    sura, *rest = nums
+    if rest and (key := (sura, rest[0])) in quran_index:
+        return {key: quran_index[key]}
 
-    key = (sura, 1)
-    if key in quran_index:
-        return {"suras": {key: quran_index[key]}}
+    if (key := (sura, 1)) in quran_index:
+        return {key: quran_index[key]}
 
     return {}
 
@@ -55,27 +52,35 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
     if not query.strip():
         return {}
 
-    nums = [int(m.group()) for m in finditer(r"\d+", query)]
+    num_matches = list(finditer(r"\d+", query))
+    nums = [int(m.group()) for m in num_matches]
     chunks = split_by_letters(query, letters)
-    text_chunk = ""
+    text_chunk, sura = "", None
+
+    def strip_sura(m):
+        nonlocal sura
+        if m.group(1) in suras.values():
+            sura = m.group(1)
+            return ""
+        return m.group(0)
 
     for chunk in chunks:
         if chunk[0] in letters:
-            text_chunk = chunk
+            chunk = sub(r"سورة\s+(\S+)", strip_sura, chunk)
+            text_chunk = sub(r"\s+", " ", chunk)
             break
 
     if text_chunk:
-        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras)
+        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras, sura)
 
         if nums:
-            filtered = {}
-            for key_type, mapping in text_results.items():
-                filtered[key_type] = {k: v for k, v in mapping.items() if k[0] in nums}
-            return filtered
+            nums_set = set(nums)
+            return {k for mapping in text_results.values() for k in mapping
+                            if k[0 if chunks[0][0].isdigit() else 1] in nums_set}
 
         return text_results
 
     elif nums:
         return number_search(nums, quran_index)
-    
+
     return {}

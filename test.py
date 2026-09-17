@@ -18,9 +18,7 @@ while True:
         break
 
     results = plain_engine.search(query)
-
-    verses = results.get("verses", {})
-    n = len(verses)
+    n = len(results)
 
     if RESHAPE:
         for i, chunk in enumerate(chunks):
@@ -33,8 +31,8 @@ while True:
     else:
         print(head)
 
-    for (sura, aya), text in verses.items():
-        verse = f"[{sura}: {aya}] {text}"
+    for (sura, aya), text in results.items():
+        verse = f"{plain_engine.suras[sura]} [{sura}: {aya}] {text}"
         if RESHAPE:
             print(align_text(apply_display(line_breaker(reshape(verse), width)), width))
 
