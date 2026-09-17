@@ -3,7 +3,7 @@ from .segmenter import split_by_letters
 from re import finditer, sub
 
 
-def verse_search(query, quran_index, clean_index, simple_index, suras, sura):
+def verse_search(query, quran_index, clean_index, simple_index, suras, suras_found):
     query_rooms = diac_rooms(query)
     query_plain = "".join(c for c in query if not combining(c))
     with_diac = any(combining(c) for c in query)
@@ -26,7 +26,7 @@ def verse_search(query, quran_index, clean_index, simple_index, suras, sura):
         return False
 
     for key, text in clean_index.items():
-        if sura and suras[key[0]] != sura:
+        if suras_found and suras[key[0]] not in suras_found:
             continue
         if query_plain in f" {text} " and matches(key):
             results[key] = quran_index[key]
@@ -54,24 +54,23 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
 
     num_matches = list(finditer(r"\d+", query))
     nums = [int(m.group()) for m in num_matches]
-    chunks = split_by_letters(query, letters)
-    text_chunk, sura = "", None
 
-    def strip_sura(m):
-        nonlocal sura
-        if m.group(1) in suras.values():
-            sura = m.group(1)
-            return ""
-        return m.group(0)
+    suras_found = set()
+    for sura in suras.values():
+        if f"سورة {sura}" in query:
+            suras_found.add(sura)
+            query = sub(rf"و?سورة {sura}", "", query)
+
+    chunks = split_by_letters(query, letters)
+    text_chunk = ""
 
     for chunk in chunks:
         if chunk[0] in letters:
-            chunk = sub(r"سورة\s+(\S+)", strip_sura, chunk)
-            text_chunk = sub(r"\s+", " ", chunk)
+            text_chunk = chunk
             break
 
     if text_chunk:
-        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras, sura)
+        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras, suras_found)
 
         if nums:
             nums_set = set(nums)
