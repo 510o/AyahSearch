@@ -3,7 +3,7 @@ from .segmenter import split_by_letters
 from re import finditer, sub
 
 
-def verse_search(query, quran_index, clean_index, simple_index, suras, suras_found):
+def verse_search(query, quran_index, clean_index, simple_index, suras, letters, suras_found):
     query_rooms = diac_rooms(query)
     query_plain = "".join(c for c in query if not combining(c))
     with_diac = any(combining(c) for c in query)
@@ -29,7 +29,7 @@ def verse_search(query, quran_index, clean_index, simple_index, suras, suras_fou
         if suras_found and suras[key[0]] not in suras_found:
             continue
         if query_plain in f" {text} " and matches(key):
-            results[key] = quran_index[key]
+            results[key] = quran_index[key], query_plain, letters
 
     return results
 
@@ -52,8 +52,7 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
     if not query.strip():
         return {}
 
-    num_matches = list(finditer(r"\d+", query))
-    nums = [int(m.group()) for m in num_matches]
+    nums = [int(m.group()) for m in finditer(r"\d+", query)]
 
     suras_found = set()
     for sura in suras.values():
@@ -70,12 +69,15 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
             break
 
     if text_chunk:
-        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras, suras_found)
+        text_results = verse_search(text_chunk, quran_index, clean_index, simple_index, suras, letters, suras_found)
 
         if nums:
             nums_set = set(nums)
-            return {k for mapping in text_results.values() for k in mapping
-                            if k[0 if chunks[0][0].isdigit() else 1] in nums_set}
+            idx = 0 if str(nums[0]) in chunks[0] else 1
+            return {
+                key: value for key, value in text_results.items()
+                if len(key) > idx and key[idx] in nums_set
+            }
 
         return text_results
 
