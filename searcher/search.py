@@ -3,6 +3,11 @@ from .segmenter import split_by_letters
 from re import finditer, sub
 
 
+def bold_matches(text, query, letters):
+    ...
+    return text
+
+
 def verse_search(query, quran_index, clean_index, simple_index, suras, letters, suras_found):
     query_rooms = diac_rooms(query)
     query_plain = "".join(c for c in query if not combining(c))
@@ -28,16 +33,14 @@ def verse_search(query, quran_index, clean_index, simple_index, suras, letters, 
     for key, text in clean_index.items():
         if suras_found and suras[key[0]] not in suras_found:
             continue
+
         if query_plain in f" {text} " and matches(key):
-            results[key] = quran_index[key], query_plain, letters
+            results[key] = bold_matches(quran_index[key], query_plain, letters)
 
     return results
 
 
 def number_search(nums, quran_index):
-    if not nums:
-        return {}
-
     sura, *rest = nums
     if rest and (key := (sura, rest[0])) in quran_index:
         return {key: quran_index[key]}
@@ -76,7 +79,7 @@ def search(query, quran_index, clean_index, simple_index, suras, letters):
             idx = 0 if str(nums[0]) in chunks[0] else 1
             return {
                 key: value for key, value in text_results.items()
-                if len(key) > idx and key[idx] in nums_set
+                if key[idx] in nums_set
             }
 
         return text_results

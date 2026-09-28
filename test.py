@@ -39,7 +39,7 @@ while True:
     if RESHAPE:
         input_layout = apply_display(line_breaker(reshape(f"search for: {query}"), width))
         for _ in range(input_layout.count("\n") +1):
-            sys.stdout.write("\033[F\033[K")
+            sys.stdout.write("\033[F\033[K") # print("\033[F\033[K", end="")
         sys.stdout.flush()
         print(input_layout)
 
