@@ -7,7 +7,7 @@ from shutil import get_terminal_size
 from main import plain_engine
 
 if RESHAPE := True: # set to False if you don't want to reshape the text for display
-    from arabicdisplayer import reshape, line_breaker, apply_display, align_text # pip install git+https://github.com/510o/ArabicDisplayer.git
+    from arabicdisplayer import * # pip install git+https://github.com/510o/ArabicDisplayer.git
 
 print(line_breaker("Ayah Search - search by letters, diacritices, or numbers", get_terminal_size().columns))
 clear = lambda: system('cls' if name == 'nt' else 'clear')
@@ -22,7 +22,7 @@ while True:
         if chunks[0] in ("exit", "stop", "quit", "break"):
             break
 
-        elif chunks[0] == "reset":
+        elif chunks[0] == "restart":
             print()
             process = Popen([sys.executable] + sys.argv)
             process.wait()
@@ -38,9 +38,7 @@ while True:
 
     if RESHAPE:
         input_layout = apply_display(line_breaker(reshape(f"search for: {query}"), width))
-        for _ in range(input_layout.count("\n") +1):
-            sys.stdout.write("\033[F\033[K") # print("\033[F\033[K", end="")
-        sys.stdout.flush()
+        sys.stdout.write("\033[F\033[K" * (input_layout.count("\n") + 1)); sys.stdout.flush()
         print(input_layout)
 
         for i, chunk in enumerate(chunks):
